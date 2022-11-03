@@ -1,5 +1,5 @@
 CC = g++
-CXXFLAGS = -Werror -Wextra -Wall
+CXXFLAGS = -Werror -Wextra -Wall -Wcatch-value=0 #Had to add this because of warning from args.h
 PROG_NAME = automata
 OBJS = main.o FiniteAutomata.o
 SOURCES = src/*.cpp

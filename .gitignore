@@ -1,0 +1,13 @@
+#IDE files
+.vscode
+.idea
+
+#OBJ files
+*.o
+automata
+
+#Test files
+test_files
+
+#Generated dependencies
+dependencies

@@ -574,7 +574,7 @@ namespace FA
         return false;
     }
 
-    bool FiniteAutomata::isUniversal()
+    bool FiniteAutomata::isUniversal( FA::Relation_t relation )
     {
 
         //Check if start state is rejecting
@@ -583,13 +583,11 @@ namespace FA
             return false;
         }
 
-        auto simulation = this->MaxSimulation();
-
         set<set<StateType>> Processed = {};
         set<set<StateType>> Next = {};
         set<set<StateType>> PN_union = {};
 
-        Next.emplace(FiniteAutomata::Minimize( this->StartStates, simulation ));
+        Next.emplace(FiniteAutomata::Minimize( this->StartStates, relation ));
 
 
         while ( ! Next.empty() )
@@ -599,7 +597,7 @@ namespace FA
             bool exists_smaller = false;
             for (const auto& state : Processed)
             {
-                if (isSmaller(state, R, simulation))
+                if (isSmaller(state, R, relation))
                 {
                     exists_smaller = true;
                     break;
@@ -615,7 +613,7 @@ namespace FA
             for (auto symbol : this->Alphabet)
             {
                 auto cur_post = Post(R, this->TFunction, symbol);
-                auto  P_state = Minimize(cur_post, simulation);
+                auto  P_state = Minimize(cur_post, relation);
 
                 //Preparations
                 //TODO optimize this
@@ -626,7 +624,7 @@ namespace FA
                 bool exists_smaller1 = false;
                 for (auto S_state : PN_union)
                 {
-                    if (isSmaller(S_state, P_state, simulation))
+                    if (isSmaller(S_state, P_state, relation))
                     {
                         exists_smaller1 = true;
                         break;
@@ -646,7 +644,7 @@ namespace FA
                 {
                     for (auto S_state : PN_union)
                     {
-                        if (isSmaller(P_state, S_state, simulation))
+                        if (isSmaller(P_state, S_state, relation))
                         {
                             Processed.erase(S_state);
                             Next.erase(S_state);

@@ -18,7 +18,10 @@ int main(int argc, char ** argv)
     nfa1.Get(input_file1);
     nfa2.Get(input_file2);
 
-    std::cout << "Is included: " << nfa1.isIncluded(nfa2) << std::endl;
+    auto union_nfa = nfa1.Union(nfa2);
+    auto relation = union_nfa.MaxSimulation();
+    std::cout << "Is included: " << nfa1.isIncluded(nfa2, relation) << std::endl;
+    free(relation);
 
     return 0;
 }

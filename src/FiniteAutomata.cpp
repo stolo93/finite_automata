@@ -796,22 +796,21 @@ namespace FA
     }
 
     //is *this included in @p another_automaton
-    bool FiniteAutomata::isIncluded(const FA::FiniteAutomata &another_automaton)
+    bool FiniteAutomata::isIncluded(const FA::FiniteAutomata &another_automaton, FA::Relation_t relation)
     {
         StateType state_offset = this->StatesCount;
         auto union_automaton = this->Union(another_automaton);
-        auto simulation = union_automaton.MaxSimulation();
 
         set<ProductState_t> Processed = {}, Next = {}, PN_union = {};
 
         //Create initial product states and minimize them
-        auto B_startState = FiniteAutomata::Minimize(another_automaton.StartStates, simulation);
+        auto B_startState = FiniteAutomata::Minimize(another_automaton.StartStates, relation);
 
         for (auto init_state : this->StartStates)
         {
             Next.emplace(make_pair(init_state, B_startState));
         }
-        Initialize(Next, simulation);
+        Initialize(Next, relation);
 
         while ( ! Next.empty() )
         {
@@ -820,7 +819,7 @@ namespace FA
             {
                 auto r1_states = FiniteAutomata::StatePost(R.first, union_automaton.TFunction, symbol);
                 auto tmpR1_states = FiniteAutomata::Post(R.second, union_automaton.TFunction, symbol);
-                auto R1_states = Minimize(tmpR1_states, simulation);
+                auto R1_states = Minimize(tmpR1_states, relation);
 
                 //LINE 6
                 for (auto r1_state : r1_states)
@@ -831,7 +830,7 @@ namespace FA
                     bool exists_smaller_state = false; //for LINE 8
                     for (auto p1 : P.second)
                     {
-                        if (simulation[P.first][p1])
+                        if (relation[P.first][p1])
                         {
                             exists_smaller_state = true;
                             break;
@@ -845,7 +844,7 @@ namespace FA
                     bool exists_smaller_in_PN = false;
                     for (auto S : PN_union)
                     {
-                        if (isProductSmaller(S, P, simulation))
+                        if (isProductSmaller(S, P, relation))
                         {
                             exists_smaller_in_PN = true;
                             break;
@@ -864,7 +863,7 @@ namespace FA
                         {
                             for (auto S : PN_union)
                             {
-                                if (simulation[S.first][P.first] && isSmaller(P.second, S.second, simulation))
+                                if (relation[S.first][P.first] && isSmaller(P.second, S.second, relation))
                                 {
                                     Processed.erase(S);
                                     Next.erase(S);

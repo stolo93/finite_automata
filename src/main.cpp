@@ -8,6 +8,11 @@
 
 int main(int argc, char ** argv)
 {
+    if ( argc < 3 )
+    {
+        return 1;
+    }
+
     std::ifstream input_file1(argv[1], std::ifstream::in);
     std::ifstream input_file2(argv[2], std::ifstream::in);
 
@@ -21,7 +26,7 @@ int main(int argc, char ** argv)
     auto union_nfa = nfa1.Union(nfa2);
     auto relation = union_nfa.MaxSimulation();
     std::cout << "Is included: " << nfa1.isIncluded(nfa2, relation) << std::endl;
-    free(relation);
+    delete [] relation;
 
     return 0;
 }

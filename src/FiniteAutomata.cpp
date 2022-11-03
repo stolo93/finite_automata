@@ -391,6 +391,18 @@ namespace FA
         }
     }
 
+    Relation_t FiniteAutomata::IdentityRelation()
+    {
+        auto relation = new bool * [StatesCount];
+        for (StateType i = 0; i < StatesCount; i++)
+        {
+            relation[i] = new bool [StatesCount];
+            relation[i][i] = true;
+        }
+
+        return relation;
+    }
+
     Relation_t FiniteAutomata::MaxSimulation()
     {
         if (StatesCount == 0)
@@ -798,7 +810,6 @@ namespace FA
     //is *this included in @p another_automaton
     bool FiniteAutomata::isIncluded(const FA::FiniteAutomata &another_automaton, FA::Relation_t relation)
     {
-        StateType state_offset = this->StatesCount;
         auto union_automaton = this->Union(another_automaton);
 
         set<ProductState_t> Processed = {}, Next = {}, PN_union = {};

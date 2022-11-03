@@ -1,4 +1,5 @@
 CC = g++
+CXXFLAGS = -Werror -Wextra -Wall
 PROG_NAME = automata
 OBJS = main.o FiniteAutomata.o
 SOURCES = src/*.cpp

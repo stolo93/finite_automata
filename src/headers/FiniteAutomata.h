@@ -76,6 +76,8 @@ namespace FA {
 
         Relation_t MaxSimulation();
 
+        Relation_t IdentityRelation();
+
         bool isUniversal( FA::Relation_t relation );
 
         bool isIncluded( const FA::FiniteAutomata &another_automaton, FA::Relation_t relation );

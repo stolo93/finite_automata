@@ -1,0 +1,5 @@
+universal-identity:
+  cmd: ../automata -i universal $1
+
+universal-simulation:
+  cmd: ../automata -s universal $1

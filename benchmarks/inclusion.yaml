@@ -1,0 +1,5 @@
+inclusion-identity:
+  cmd: ../automata -i inclusion $1
+
+inclusion-simulation:
+  cmd: ../automata -s inclusion $1

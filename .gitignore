@@ -11,3 +11,14 @@ test_files
 
 #Generated dependencies
 dependencies
+
+#Python venv
+benchmarks/lib/
+benchmarks/lib64
+benchmarks/bin
+benchmarks/pyvenv.cfg
+benchmarks/include
+
+#Benchmarks
+benchmarks/*.out
+benchmarks/*.csv

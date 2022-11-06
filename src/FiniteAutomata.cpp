@@ -630,8 +630,8 @@ namespace FA
                 //Preparations
                 //TODO optimize this
                 PN_union.clear();
-                PN_union.merge(Processed);
-                PN_union.merge(Next);
+                PN_union.insert(Processed.begin(), Processed.end());
+                PN_union.insert(Next.begin(), Next.end());
 
                 bool exists_smaller1 = false;
                 for (auto S_state : PN_union)
@@ -849,8 +849,8 @@ namespace FA
                     }
 
                     PN_union.clear();
-                    PN_union.merge(Processed);
-                    PN_union.merge(Next);
+                    PN_union.insert(Processed.begin(), Processed.end());
+                    PN_union.insert(Next.begin(), Next.end());
 
                     bool exists_smaller_in_PN = false;
                     for (auto S : PN_union)
@@ -893,11 +893,11 @@ namespace FA
 
     std::set<StateType> FiniteAutomata::Minimize(const std::set<StateType> &MacroState, FA::Relation_t &Simulation)
     {
-        set<StateType> R = set(MacroState);
+        auto R = set<StateType> (MacroState.begin(), MacroState.end());
 
         for (auto P_state : R)
         {
-            set<StateType> tmp = set(R);
+            auto tmp = set<StateType> (R.begin(), R.end());
             tmp.erase(P_state);
 
             for (auto S_state : tmp)

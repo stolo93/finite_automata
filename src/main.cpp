@@ -7,6 +7,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <chrono>
 
 int main(int argc, char ** argv)
 {
@@ -51,10 +52,18 @@ int main(int argc, char ** argv)
                 auto nfa = FA::FiniteAutomata();
                 nfa.Get(file);
 
+                auto start_time_uni = std::chrono::high_resolution_clock::now();
+
                 FA::Relation_t relation;
                 if ( simulation )
                 {
+                    auto start_time_sim = std::chrono::high_resolution_clock::now();
                     relation = nfa.MaxSimulation();
+
+                    //Calculate and print time consumed by computing simulation [microseconds]
+                    auto stop_time_sim = std::chrono::high_resolution_clock::now();
+                    auto duration_sim = std::chrono::duration_cast<std::chrono::microseconds> (stop_time_sim - start_time_sim);
+                    std::cout << "simulation-time: " << duration_sim.count() << std::endl;
                 }
 
                 else
@@ -62,7 +71,14 @@ int main(int argc, char ** argv)
                     relation = nfa.IdentityRelation();
                 }
 
-                std::cout << path << " " << nfa.isUniversal(relation) << std::endl;
+                nfa.isUniversal(relation);
+
+                //Calculate and print time consumed by computing universality [microseconds]
+                auto stop_time_uni = std::chrono::high_resolution_clock::now();
+                auto duration_uni = std::chrono::duration_cast<std::chrono::microseconds> (stop_time_uni - start_time_uni);
+                std::cout << "universality-time: " << duration_uni.count() << std::endl;
+
+                free(relation);
                 file.close();
             }
         }
@@ -89,9 +105,17 @@ int main(int argc, char ** argv)
             auto union_automaton = nfa1.Union(nfa2);
             FA::Relation_t relation;
 
+            auto start_time_incl = std::chrono::high_resolution_clock::now();
+
             if ( simulation )
             {
+                auto start_time_sim = std::chrono::high_resolution_clock::now();
                 relation = union_automaton.MaxSimulation();
+
+                //Calculate and print time consumed by computing simulation
+                auto stop_time_sim = std::chrono::high_resolution_clock::now();
+                auto duration_sim = std::chrono::duration_cast<std::chrono::microseconds> (stop_time_sim - start_time_sim);
+                std::cout << "simulation-time: " << duration_sim.count() << std::endl;
             }
             else
             {
@@ -99,7 +123,13 @@ int main(int argc, char ** argv)
             }
 
             // Check language inclusion
-            std::cout << *path_it << " <= " << *(path_it + 1) << " :" << nfa1.isIncluded(nfa2, relation) << std::endl;
+            nfa1.isIncluded(nfa2, relation);
+
+            //Calculate and print time consumed by computing inclusion
+            auto stop_time_incl = std::chrono::high_resolution_clock::now();
+            auto duration_incl = std::chrono::duration_cast<std::chrono::microseconds> (stop_time_incl - start_time_incl);
+            std::cout << "inclusion-time: " << duration_incl.count() << std::endl;
+
             delete [] relation;
         }
     }

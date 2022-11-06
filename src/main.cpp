@@ -78,7 +78,7 @@ int main(int argc, char ** argv)
                 auto duration_uni = std::chrono::duration_cast<std::chrono::microseconds> (stop_time_uni - start_time_uni);
                 std::cout << "universality-time: " << duration_uni.count() << std::endl;
 
-                free(relation);
+                delete [] relation;
                 file.close();
             }
         }
@@ -117,6 +117,7 @@ int main(int argc, char ** argv)
                 auto duration_sim = std::chrono::duration_cast<std::chrono::microseconds> (stop_time_sim - start_time_sim);
                 std::cout << "simulation-time: " << duration_sim.count() << std::endl;
             }
+
             else
             {
                 relation = union_automaton.IdentityRelation();

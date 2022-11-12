@@ -1,0 +1,12 @@
+#!/usr/bin/python3
+
+lines = open("benchmark.input", "r").read().split("\n")
+
+for i in range(len(lines)-2):
+    if i == 0:
+        print(lines[i] + " " + lines[len(lines)-2])
+    elif i == (len(lines)):
+        print(lines[i] + " " + lines[0])
+    else:
+        print(lines[i] + " " + lines[i-1])
+

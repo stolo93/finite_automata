@@ -13,6 +13,7 @@ test_files
 dependencies
 
 #Python venv
+env
 benchmarks/lib/
 benchmarks/lib64
 benchmarks/bin

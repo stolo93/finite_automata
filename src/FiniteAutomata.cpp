@@ -396,7 +396,7 @@ namespace FA
         auto relation = new bool * [StatesCount];
         for (StateType i = 0; i < StatesCount; i++)
         {
-            relation[i] = new bool [StatesCount];
+            relation[i] = new bool [StatesCount]();
             relation[i][i] = true;
         }
 
@@ -763,12 +763,8 @@ namespace FA
             temp_automaton.FinalStates.emplace(temp_automaton.States.at(state));
         }
 
-        //Insert union of the alphabets //TODO whether this is the correct procedure
+        //Insert alphabet of the first automaton, whoever is calling this function should ensure that both automata have the same alphabet
         for (auto symbol : this->Alphabet)
-        {
-            temp_automaton.Alphabet.emplace(symbol);
-        }
-        for (auto symbol : another_automaton.Alphabet)
         {
             temp_automaton.Alphabet.emplace(symbol);
         }
@@ -810,6 +806,12 @@ namespace FA
     //is *this included in @p another_automaton
     bool FiniteAutomata::isIncluded(const FA::FiniteAutomata &another_automaton, FA::Relation_t relation)
     {
+        // Check if the alphabets are the same
+        if ( this->Alphabet != another_automaton.Alphabet )
+        {
+            return false;
+        }
+
         auto union_automaton = this->Union(another_automaton);
 
         set<ProductState_t> Processed = {}, Next = {}, PN_union = {};

@@ -3,6 +3,7 @@
 //
 
 #include "headers/FiniteAutomata.h"
+#include "3rd_party/include/simlib/explicit_lts.hh"
 #include <iostream>
 #include <sstream>
 #include <fstream> //getline doesn't work without this for some reason
@@ -114,12 +115,18 @@ namespace FA
     FiniteAutomata::FiniteAutomata()
     {
         StatesCount = 0;
+        SymbolCount = 0;
         TFunction = TransitionFunction();
     }
 
     StateType FiniteAutomata::Size() const
     {
         return StatesCount;
+    }
+
+    size_t FiniteAutomata::AlphabetSize() const
+    {
+        return SymbolCount;
     }
 
     void FiniteAutomata::Get(ifstream& stream)
@@ -180,7 +187,8 @@ namespace FA
                 line = line.substr(10);
                 while (get_token(line, cur_token))
                 {
-                    Alphabet.insert(cur_token);
+                    // Alphabet.insert(cur_token);
+                    InsertSymbol(cur_token, SymbolCount);
                 }
                 continue;
             }
@@ -203,7 +211,8 @@ namespace FA
                 get_token(line, symbol);
                 get_token(line,state2);
 
-                Alphabet.insert(symbol);
+                // Alphabet.insert(symbol);
+                InsertSymbol(symbol, SymbolCount);
 
                 if (States.count(state1) == 0 || States.count(state2) == 0)
                 {
@@ -307,6 +316,20 @@ namespace FA
             StatesDictionary.emplace(index, state);
             return true;
         }
+        return false;
+    }
+
+    bool FiniteAutomata::InsertSymbol(string& symbol, size_t& index)
+    {
+        auto result = AlphabetMap.emplace(symbol, index);
+        if (result.second)
+        {
+            AlphabetDictionary.emplace(index, symbol);
+            Alphabet.emplace(symbol);
+            index++;
+            return true;
+        }
+
         return false;
     }
 
@@ -499,6 +522,54 @@ namespace FA
         return sim_complement;
     }
 
+    Relation_t FiniteAutomata::MaxSimulation_simlib()
+    {
+        Simlib::ExplicitLTS LTSforSimulation;
+        StateType state_count = this->StatesCount;
+
+        // Insert copy *this automaton to LTSforSimulation
+        for (StateType state1 = 0; state1 < state_count; state1++)
+        {
+            auto transition_from_state = this->TFunction.AllTransitions[state1];
+            for (const auto &symbol : this->Alphabet)
+            {
+                if (transition_from_state.count(symbol) != 0)
+                {
+                    for (auto state2 : transition_from_state.at(symbol))
+                    {
+                        //Now insert
+                        LTSforSimulation.add_transition(state1, AlphabetMap.at(symbol), state2);
+                    }
+                }
+            }
+        }
+
+        //TODO ?// final states cannot be simulated by nonfinal -> we add new selfloops over final states with new symbol in LTS
+        for ( auto final_state : FinalStates )
+        {
+            LTSforSimulation.add_transition(final_state, SymbolCount + 1, final_state);
+        }
+
+        LTSforSimulation.init();
+        auto simulation_relation = LTSforSimulation.compute_simulation();
+
+        // Convert Simlib::BinaryRelation for FA::Relation_t
+        auto relation_size = simulation_relation.size();
+
+        Relation_t return_simulation = new bool* [relation_size];
+        for (size_t i = 0; i < relation_size; i++)
+        {
+            return_simulation[i] = new bool [relation_size]();
+        }
+
+        for (size_t i = 0; i < relation_size; i++ ){
+            for(size_t j = 0; j < relation_size; j++){
+                return_simulation[i][j] = simulation_relation.get(i,j);
+            }
+        }
+
+        return return_simulation;
+    }
     void FiniteAutomata::PrintRelation(ostream &stream, Relation_t Relation)
     {
         //print the header
@@ -766,7 +837,8 @@ namespace FA
         //Insert alphabet of the first automaton, whoever is calling this function should ensure that both automata have the same alphabet
         for (auto symbol : this->Alphabet)
         {
-            temp_automaton.Alphabet.emplace(symbol);
+            // temp_automaton.Alphabet.emplace(symbol);
+            temp_automaton.InsertSymbol(symbol, temp_automaton.SymbolCount);
         }
 
         //Insert union of the transition rules

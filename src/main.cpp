@@ -19,8 +19,9 @@ int main(int argc, char ** argv)
         args::Command universal ( commands, "universal", "Check universality of all given finite automata" );
         args::Command inclusion ( commands, "inclusion", "Check whether the language defined by FA1 is a subset of language defined by FA2. FA1 and FA2 are finite automata given as CL arguments" );
 
-    args::Group inclusion_flags ( parser, "Mantain exclusivity while using these flags. It only makes sense to use these with commands: \"universal\"", args::Group::Validators::AtMostOne );
+    args::Group inclusion_flags ( parser, "Mantain exclusivity while using these flags. It only makes sense to use these with commands: \"universal and inclusion\"", args::Group::Validators::AtMostOne );
         args::Flag simulation ( inclusion_flags, "Simulation", "Use simulation relation", {'s',"simulation"} );
+        args::Flag simulation_simlib ( inclusion_flags, "Simulation from Simlib", "Use simulation relation (simlib)", {"sim_simlib"} );
         args::Flag identity ( inclusion_flags, "Identity", "Use identity relation (default option)", {'i',"identitiy"} );
 
     args::Group arguments ( parser, "Command arguments:", args::Group::Validators::DontCare, args::Options::Global );
@@ -64,6 +65,15 @@ int main(int argc, char ** argv)
                     auto stop_time_sim = std::chrono::high_resolution_clock::now();
                     auto duration_sim = std::chrono::duration_cast<std::chrono::microseconds> (stop_time_sim - start_time_sim);
                     std::cout << "simulation-time: " << duration_sim.count() << std::endl;
+                }
+
+                else if ( simulation_simlib )
+                {
+                    auto start_time_sim = std::chrono::high_resolution_clock::now();
+                    relation = nfa.MaxSimulation_simlib();
+
+                    auto stop_time_sim = std::chrono::high_resolution_clock::now();
+                    auto duration_sim = std::chrono::duration_cast<std::chrono::microseconds> (stop_time_sim - start_time_sim);
                 }
 
                 else
@@ -116,6 +126,15 @@ int main(int argc, char ** argv)
                 auto stop_time_sim = std::chrono::high_resolution_clock::now();
                 auto duration_sim = std::chrono::duration_cast<std::chrono::microseconds> (stop_time_sim - start_time_sim);
                 std::cout << "simulation-time: " << duration_sim.count() << std::endl;
+            }
+
+            else if ( simulation_simlib )
+            {
+                auto start_time_sim = std::chrono::high_resolution_clock::now();
+                relation = union_automaton.MaxSimulation_simlib();
+
+                auto stop_time_sim = std::chrono::high_resolution_clock::now();
+                auto duration_sim = std::chrono::duration_cast<std::chrono::microseconds> (stop_time_sim - start_time_sim);
             }
 
             else

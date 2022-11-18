@@ -1,5 +1,5 @@
 inclusion-identity:
-  cmd: ../automata -i inclusion $1 $2
+  cmd: ../automata -i inclusion $1
 
 inclusion-simulation:
-  cmd: ../automata -s inclusion $1 $2
+  cmd: ../automata --sim_simlib inclusion $1 $2

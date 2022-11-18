@@ -114,12 +114,18 @@ namespace FA
     FiniteAutomata::FiniteAutomata()
     {
         StatesCount = 0;
+        SymbolCount = 0;
         TFunction = TransitionFunction();
     }
 
     StateType FiniteAutomata::Size() const
     {
         return StatesCount;
+    }
+
+    size_t FiniteAutomata::AlphabetSize() const
+    {
+        return SymbolCount;
     }
 
     void FiniteAutomata::Get(ifstream& stream)

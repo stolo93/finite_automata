@@ -70,6 +70,8 @@ namespace FA {
 
         StateType Size() const;
 
+        size_t AlphabetSize() const;
+
         void Get(std::ifstream  &stream);
 
         void Print(std::ostream &stream);
@@ -91,12 +93,15 @@ namespace FA {
         std::string Name;
         std::unordered_map<std::string, StateType> States;
         std::unordered_map<StateType, std::string> StatesDictionary;
+        std::unordered_map<std::string, size_t> AlphabetMap;
+        std::unordered_map<size_t, std::string> AlphabetDictionary;
         std::set<std::string> Alphabet;
         std::set<StateType> StartStates;
         std::set<StateType> FinalStates;
         FA::TransitionFunction TFunction;
 
         StateType StatesCount;
+        size_t SymbolCount;
 
         /**
          * @brief Prepare file containing finite automaton for parsing

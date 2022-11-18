@@ -74,6 +74,7 @@ int main(int argc, char ** argv)
 
                     auto stop_time_sim = std::chrono::high_resolution_clock::now();
                     auto duration_sim = std::chrono::duration_cast<std::chrono::microseconds> (stop_time_sim - start_time_sim);
+                    std::cout << "simulation-time: " << duration_sim.count() << std::endl;
                 }
 
                 else

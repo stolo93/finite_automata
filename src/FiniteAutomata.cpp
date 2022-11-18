@@ -186,7 +186,8 @@ namespace FA
                 line = line.substr(10);
                 while (get_token(line, cur_token))
                 {
-                    Alphabet.insert(cur_token);
+                    // Alphabet.insert(cur_token);
+                    InsertSymbol(cur_token, SymbolCount);
                 }
                 continue;
             }
@@ -209,7 +210,8 @@ namespace FA
                 get_token(line, symbol);
                 get_token(line,state2);
 
-                Alphabet.insert(symbol);
+                // Alphabet.insert(symbol);
+                InsertSymbol(symbol, SymbolCount);
 
                 if (States.count(state1) == 0 || States.count(state2) == 0)
                 {
@@ -313,6 +315,20 @@ namespace FA
             StatesDictionary.emplace(index, state);
             return true;
         }
+        return false;
+    }
+
+    bool FiniteAutomata::InsertSymbol(string& symbol, size_t& index)
+    {
+        auto result = AlphabetMap.emplace(symbol, index);
+        if (result.second)
+        {
+            AlphabetDictionary.emplace(index, symbol);
+            Alphabet.emplace(symbol);
+            index++;
+            return true;
+        }
+
         return false;
     }
 
@@ -772,7 +788,8 @@ namespace FA
         //Insert alphabet of the first automaton, whoever is calling this function should ensure that both automata have the same alphabet
         for (auto symbol : this->Alphabet)
         {
-            temp_automaton.Alphabet.emplace(symbol);
+            // temp_automaton.Alphabet.emplace(symbol);
+            temp_automaton.InsertSymbol(symbol, temp_automaton.SymbolCount);
         }
 
         //Insert union of the transition rules

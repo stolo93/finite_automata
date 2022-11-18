@@ -136,6 +136,8 @@ namespace FA {
          */
         bool InsertState(std::string &state, StateType index);
 
+        bool InsertSymbol(std::string &symbol, size_t &index);
+
         static std::set<StateType> Minimize ( const std::set<StateType> &State, Relation_t &Simulation);
 
         static std::set<StateType> Post ( std::set<StateType> &State, TransitionFunction &T_Function, std::string &symbol );

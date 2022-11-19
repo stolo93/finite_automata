@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <stdlib.h> //exit
 #include <vector>
+#include <chrono>
 
 using namespace std;
 
@@ -522,10 +523,14 @@ namespace FA
         return sim_complement;
     }
 
-    Relation_t FiniteAutomata::MaxSimulation_simlib()
+    Relation_t FiniteAutomata::MaxSimulation_simlib(std::chrono::microseconds &conversion_time)
     {
         Simlib::ExplicitLTS LTSforSimulation;
         StateType state_count = this->StatesCount;
+
+
+        //Time required to convert automata to simlib format
+        auto conv_start = chrono::high_resolution_clock::now();
 
         // Insert copy *this automaton to LTSforSimulation
         for (StateType state1 = 0; state1 < state_count; state1++)
@@ -544,14 +549,30 @@ namespace FA
             }
         }
 
-        //TODO ?// final states cannot be simulated by nonfinal -> we add new selfloops over final states with new symbol in LTS
+        // final states cannot be simulated by nonfinal -> we add new selfloops over final states with new symbol in LTS
         for ( auto final_state : FinalStates )
         {
             LTSforSimulation.add_transition(final_state, SymbolCount + 1, final_state);
         }
 
         LTSforSimulation.init();
+
+        auto conv_stop = chrono::high_resolution_clock::now();
+        auto conv_duration = chrono::duration_cast<chrono::microseconds> (conv_stop - conv_start);
+
+
+        // Time of computing simulation
+        auto sim_start = chrono::high_resolution_clock::now();
+
         auto simulation_relation = LTSforSimulation.compute_simulation();
+
+        auto sim_stop = chrono::high_resolution_clock::now();
+        auto sim_duration = chrono::duration_cast<chrono::microseconds> (sim_stop - sim_start);
+        std::cout << "simulation-time:" << sim_duration.count() << std::endl;
+
+
+        // Time of converting back from from simlib format
+        auto conv2_start = chrono::high_resolution_clock::now();
 
         // Convert Simlib::BinaryRelation for FA::Relation_t
         auto relation_size = simulation_relation.size();
@@ -567,6 +588,12 @@ namespace FA
                 return_simulation[i][j] = simulation_relation.get(i,j);
             }
         }
+
+        auto conv2_stop = chrono::high_resolution_clock::now();
+        auto conv2_duration = chrono::duration_cast<chrono::microseconds> (conv2_stop - conv2_start);
+
+
+        conversion_time = (conv_duration + conv2_duration);
 
         return return_simulation;
     }

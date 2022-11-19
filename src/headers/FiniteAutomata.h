@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <set>
 #include <string>
-
+#include <chrono>
 
 namespace FA {
 
@@ -78,7 +78,7 @@ namespace FA {
 
         Relation_t MaxSimulation();
 
-        Relation_t MaxSimulation_simlib();
+        Relation_t MaxSimulation_simlib(std::chrono::microseconds &conversion_time);
 
         Relation_t IdentityRelation();
 

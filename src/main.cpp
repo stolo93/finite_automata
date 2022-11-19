@@ -30,6 +30,7 @@ int main(int argc, char ** argv)
     try
     {
         parser.ParseCLI(argc, argv);
+        std::chrono::microseconds conversion_time (0);
 
         if ( print )
         {
@@ -64,17 +65,13 @@ int main(int argc, char ** argv)
                     //Calculate and print time consumed by computing simulation [microseconds]
                     auto stop_time_sim = std::chrono::high_resolution_clock::now();
                     auto duration_sim = std::chrono::duration_cast<std::chrono::microseconds> (stop_time_sim - start_time_sim);
-                    std::cout << "simulation-time: " << duration_sim.count() << std::endl;
+                    std::cout << "simulation-time:" << duration_sim.count() << std::endl;
                 }
 
                 else if ( simulation_simlib )
                 {
-                    auto start_time_sim = std::chrono::high_resolution_clock::now();
-                    relation = nfa.MaxSimulation_simlib();
-
-                    auto stop_time_sim = std::chrono::high_resolution_clock::now();
-                    auto duration_sim = std::chrono::duration_cast<std::chrono::microseconds> (stop_time_sim - start_time_sim);
-                    std::cout << "simulation-time: " << duration_sim.count() << std::endl;
+                    // Time measured and printed from insede of function
+                    relation = nfa.MaxSimulation_simlib(conversion_time);
                 }
 
                 else
@@ -87,7 +84,7 @@ int main(int argc, char ** argv)
                 //Calculate and print time consumed by computing universality [microseconds]
                 auto stop_time_uni = std::chrono::high_resolution_clock::now();
                 auto duration_uni = std::chrono::duration_cast<std::chrono::microseconds> (stop_time_uni - start_time_uni);
-                std::cout << "universality-time: " << duration_uni.count() << std::endl;
+                std::cout << "universality-time:" << (duration_uni.count()-conversion_time.count()) << std::endl;
 
                 delete [] relation;
                 file.close();
@@ -126,16 +123,13 @@ int main(int argc, char ** argv)
                 //Calculate and print time consumed by computing simulation
                 auto stop_time_sim = std::chrono::high_resolution_clock::now();
                 auto duration_sim = std::chrono::duration_cast<std::chrono::microseconds> (stop_time_sim - start_time_sim);
-                std::cout << "simulation-time: " << duration_sim.count() << std::endl;
+                std::cout << "simulation-time:" << duration_sim.count() << std::endl;
             }
 
             else if ( simulation_simlib )
             {
-                auto start_time_sim = std::chrono::high_resolution_clock::now();
-                relation = union_automaton.MaxSimulation_simlib();
-
-                auto stop_time_sim = std::chrono::high_resolution_clock::now();
-                auto duration_sim = std::chrono::duration_cast<std::chrono::microseconds> (stop_time_sim - start_time_sim);
+                // Time measured and printed from insede of function
+                relation = union_automaton.MaxSimulation_simlib(conversion_time);
             }
 
             else
@@ -149,7 +143,7 @@ int main(int argc, char ** argv)
             //Calculate and print time consumed by computing inclusion
             auto stop_time_incl = std::chrono::high_resolution_clock::now();
             auto duration_incl = std::chrono::duration_cast<std::chrono::microseconds> (stop_time_incl - start_time_incl);
-            std::cout << "inclusion-time: " << duration_incl.count() << std::endl;
+            std::cout << "inclusion-time:" << (duration_incl.count()-conversion_time.count()) << std::endl;
 
             delete [] relation;
         }

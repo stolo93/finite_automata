@@ -21,6 +21,7 @@ benchmarks/pyvenv.cfg
 benchmarks/include
 
 #Benchmarks
+benchmarks/benchmark_results
 benchmarks/*.input
 benchmarks/*.out
 benchmarks/*.csv

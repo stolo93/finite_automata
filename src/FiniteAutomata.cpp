@@ -397,6 +397,9 @@ namespace FA
         minimize_macro_state(start_states, relation);
         next.emplace(start_states);
 
+        // Count visited states, initial state was already visited
+        size_t visited_states = 1;
+
         while ( ! next.empty() ){
             // Pick and remove macro state R from next and move it to processed
             auto ms_R = *next.begin();
@@ -406,6 +409,8 @@ namespace FA
             auto post_ms_R = post_macro_state(ms_R);
 
             for ( auto ms_P : post_ms_R ){
+                visited_states++;
+
                 minimize_macro_state(ms_P, relation);
 
                 if ( ! is_macro_state_accepting(ms_P) ){
@@ -427,20 +432,21 @@ namespace FA
                     }
                 }
 
-                // If such macro state S exists, remove all S from union of processed and next, such that P < S and add P to next
+                // If such macro state S does not exist, remove all S from union of processed and next, such that P < S and then add P to next
                 if ( ! exists_smaller ){
                     for ( auto ms_S : pn_union ){
                         if ( is_macro_state_smaller(ms_P, ms_S, relation) ){
                             processed.erase(ms_S);
                             next.erase(ms_S);
-
-                            next.emplace(ms_P);
                         }
                     }
+
+                    next.emplace(ms_P);
                 }
             }
         }
 
+        std::cout << "states-visited:" << visited_states << std::endl;
         return true;
     }
 
@@ -701,8 +707,14 @@ namespace FA
         set<state_type_t> tmp_states (macro_state);
 
         for ( const auto state1 : tmp_states ){
+            if ( macro_state.count(state1) == 0){
+                continue;
+            }
             for ( const auto state2 : tmp_states ){
 
+                if ( macro_state.count(state2) == 0 ){
+                    continue;
+                }
                 // if state1 and state2 are not the same states and if state1 is simulated by state2, delete state1
                 if ( state1 != state2  && relation.get(state1, state2) ){
                     macro_state.erase(state1);

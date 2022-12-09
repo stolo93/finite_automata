@@ -5,7 +5,7 @@ OBJS = main.o FiniteAutomata.o simlib.o
 SOURCES = src/*.cpp
 VPATH = src:
 
-all: dependencies main
+all: main
 
 main: $(OBJS)
 	$(CC) -o $(PROG_NAME) $^
@@ -13,12 +13,7 @@ main: $(OBJS)
 simlib.o:
 	g++ -c -Wall -Wfloat-equal -fms-extensions -fdiagnostics-show-option -std=c++14 -Wctor-dtor-privacy -Weffc++ -fPIC -fno-strict-aliasing src/3rd_party/explicit_lts_sim.cc -o $@
 
-dependencies:
-	$(CC) -MM $(SOURCES) > $@
-
--include dependencies
-
 clean:
-	rm *.o automata dependencies
+	rm *.o automata
 
 .PHONY: all main dependencies clean

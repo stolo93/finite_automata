@@ -1,6 +1,10 @@
-//
-// Created by samuel on 7.10.2022.
-//
+/**
+ * @file FiniteAutomata.h
+ * @author Samuel Stolarik (xstola03@stud.fit.vutbr.cz)
+ *
+ * @date 2022-12-02
+ *
+ */
 
 #pragma once
 
@@ -8,102 +12,244 @@
 #include <set>
 #include <string>
 #include <chrono>
+#include <vector>
 
 namespace FA {
 
-    using StateType = unsigned;
-    using Transition_t = std::unordered_map<std::string, std::set<StateType>>;
-    using Relation_t = bool **;
-    using ProductState_t = std::pair<StateType, std::set<StateType>>;
+    using state_type_t = unsigned;
+    using symbol_type_t = unsigned;
+    using macro_state_t = std::set<state_type_t>;
+    using product_state_t = std::pair<state_type_t, macro_state_t>;
+
+    class States {
+    public:
+        /**
+         * @brief Construct a new States object
+         *
+         */
+        States();
+
+        /**
+         * @brief Print all states to output stream @p steam
+         *
+         * @param stream
+         */
+        void print(std::ostream& stream, const char* typeof_state = "States") const;
+
+        /**
+         * @brief Get number of states
+         *
+         * @return state_type_t number of states
+         */
+        state_type_t size() const;
+
+        /**
+         * @brief Get the states object
+         *
+         * @return Set of states
+         */
+        std::set<state_type_t> get_states() const;
+
+        /**
+         * @brief Get the real name of state hashed to @p state
+         *
+         * @param state
+         * @return std::string
+         */
+        std::string get_state_name(state_type_t state) const;
+
+        void set_state_name(state_type_t state, std::string name_new);
+
+        /**
+         * @brief Get the hash of state @p state
+         *
+         * @param state name of state
+         * @param dst return through refference
+         * @return true if @p state is in states, otherwise @p dst remains unchanged
+         */
+        bool get_state_hash(std::string& state, state_type_t& dst) const;
+
+        /**
+         * @brief Return maximum of all hashes of currently existing states
+         *
+         * @return state_type_t
+         */
+        state_type_t get_max_hash() const;
+
+        /**
+         * @brief Insert state to the set of states
+         *
+         * @param state
+         * @return true upon successfull insertion
+         */
+        bool insert_state(std::string &state);
+
+        bool insert_state_at_index(std::string& state, state_type_t index);
+
+        /**
+         * @brief Delete
+         *
+         * @param state
+         * @return true
+         * @return false
+         */
+        bool delete_state(state_type_t state);
+
+        /**
+         * @brief Check if @p state belongs to states
+         *
+         * @param state
+         * @return true if @p state is in m_states, false otherwise
+         */
+        bool belongs_to(state_type_t state) const;
+
+        void set_state_index_offset(state_type_t offset);
+
+    protected:
+        state_type_t m_size;
+        std::set<state_type_t> m_states;
+
+        std::unordered_map<std::string, state_type_t> states_hash;
+        std::unordered_map<state_type_t, std::string> states_dictionary;
+
+    private:
+        state_type_t m_next_state_index;
+    }; // Class states
+
+    class Alphabet {
+    public:
+
+        /**
+         * @brief Construct a new Alphabet object
+         *
+         */
+        Alphabet();
+
+        /**
+         * @brief Get the symbols object
+         *
+         * @return std::set<symbol_type_t>
+         */
+        std::set<symbol_type_t> get_symbols();
+
+        /**
+         * @brief Print all symbol to output stream @p steam
+         *
+         * @param stream
+         */
+        void print(std::ostream &stream) const;
+
+        /**
+         * @brief Get the size of the alphabet
+         *
+         * @return symbol_type_t number of symbols
+         */
+        symbol_type_t size() const;
+
+        /**
+         * @brief Insert @p symbol into the alphabet
+         *
+         * @param symbol
+         * @return true upon successfull insertion
+         */
+        bool insert_symbol(std::string& symbol);
+
+        /**
+         * @brief Get the symbols object
+         *
+         * @return Set of all symbols in alphabet
+         */
+        std::set<symbol_type_t> get_symbols() const;
+
+        /**
+         * @brief Get the symbol object
+         *
+         * @param symbol
+         * @return std::string
+         */
+        std::string get_symbol(symbol_type_t symbol) const;
+
+        /**
+         * @brief Return the hash of @p symbol through @p dst
+         *
+         * @param symbol
+         * @param dst
+         * @return true if @p symbol is in alphabet, otherwise @p dst remains unchanged
+         */
+        bool get_symbol_hash(std::string& symbol, symbol_type_t& dst) const;
+
+    protected:
+        symbol_type_t m_size;
+        std::set<symbol_type_t> m_symbols;
+        std::unordered_map<std::string, symbol_type_t> symbol_hash;
+        std::unordered_map<symbol_type_t, std::string> symbol_dictionary;
+    }; // Class alphabet
 
     class TransitionFunction {
     public:
-        FA::Transition_t * AllTransitions;
-        StateType m_StatesCount;
-        std::set<std::string> * m_Alphabet;
-
-        TransitionFunction();
-        explicit TransitionFunction(StateType Size, std::set<std::string> *Alphabet);
-
-        ~TransitionFunction();
-
         /**
-         * Initialize object returned by the default constructor
-         * Nothing will happen if the object is already used
-         * @param Size
-         */
-        void TransitionFunctionInit(StateType Size, std::set<std::string> *Alphabet);
-
-        /**
+         * @brief Construct a new Transition Function object
          *
-         * @return True if the object is uninitialized, false otherwise
+         * @param state_count
+         * @param symbol_count
          */
-        bool Empty() const;
+        TransitionFunction(state_type_t state_count = 0, symbol_type_t symbol_count = 0);
 
         /**
-         * Insert transition from @p state1 to @p state2 on @p symbol
+         * @brief Get set of all states which are on the right side of rules starting with state @p p and symbol @p a
+         * pa -> {}
          *
-         * If called on uninitialized TransitionFunction object, nothing will be added
-         * @param state1
-         * @param symbol
-         * @param state2
+         * @param p
+         * @param a
+         * @return std::set<state_type_t> pa -> {}
+         */
+        std::set<state_type_t> get_states(state_type_t p, symbol_type_t a) const;
+
+        /**
+         * Insert transition from @p p to @p q on @p a
+         *
+         * @param p state from
+         * @param a symbol
+         * @param q state to
          *
          * @return True if transition was successfully added, false otherwise
          */
-        bool InsertTransition(StateType state1, const std::string &symbol, StateType state2);
+        bool insert_transition(state_type_t p, symbol_type_t a , state_type_t q);
 
         /**
-         * Compute reversal of the this transition function
+         * @brief Delete transition from @p p to @p q on @p a
          *
-         * @return Initialized object containing the reversed TransitionFunction
+         * @param p state from
+         * @param a symbol
+         * @param q state to
+         *
+         * @return True if transition was successfully added, false otherwise
          */
-        TransitionFunction* Revert() const;
+        bool delete_transition(state_type_t p, symbol_type_t a, state_type_t q);
 
-    }; //class TransitionFunction
+        /**
+         * @brief Deletes all transitions from @p state and also all transitions to @p state
+         *
+         * @param state
+         * @return Number of deleted transiotions
+         */
+        size_t erase_state(state_type_t state);
 
-
-
-
-    class FiniteAutomata {
-    public:
-        FiniteAutomata();
-
-        StateType Size() const;
-
-        size_t AlphabetSize() const;
-
-        void Get(std::ifstream  &stream);
-
-        void Print(std::ostream &stream);
-
-        Relation_t MaxSimulation();
-
-        Relation_t MaxSimulation_simlib(std::chrono::microseconds &conversion_time);
-
-        Relation_t IdentityRelation();
-
-        bool isUniversal( FA::Relation_t relation );
-
-        bool isIncluded( const FA::FiniteAutomata &another_automaton, FA::Relation_t relation );
-
-        void PrintRelation(std::ostream &stream, Relation_t Relation);
-
-        FA::FiniteAutomata Union(const FA::FiniteAutomata &another_automaton);
+        /**
+         * @brief Create and return reversion of this transition function
+         *
+         * @return reverted transition function
+         */
+        TransitionFunction * revert() const;
 
     protected:
-        //Data members
-        std::string Name;
-        std::unordered_map<std::string, StateType> States;
-        std::unordered_map<StateType, std::string> StatesDictionary;
-        std::unordered_map<std::string, size_t> AlphabetMap;
-        std::unordered_map<size_t, std::string> AlphabetDictionary;
-        std::set<std::string> Alphabet;
-        std::set<StateType> StartStates;
-        std::set<StateType> FinalStates;
-        FA::TransitionFunction TFunction;
+        std::vector<std::vector<std::set<state_type_t>>> transition_function;
+        state_type_t m_state_count;
+        symbol_type_t m_symbol_count;
+    }; //class TransitionFunction
 
-        StateType StatesCount;
-        size_t SymbolCount;
+    class Utils {
+    public:
 
         /**
          * @brief Prepare file containing finite automaton for parsing
@@ -119,41 +265,202 @@ namespace FA {
 
         static std::string remove_whitespaces(std::string &line, const std::string &whitespace);
 
-        void print_all_states(std::ostream &stream);
-
-        void print_start_states(std::ostream &stream);
-
-        void print_accept_states(std::ostream &stream);
-
-        void print_alphabet(std::ostream &stream);
-
-        void print_tfunc(std:: ostream &stream, FA::TransitionFunction &Tfunc);
         /**
-         * @brief Add state into the FA
-         * Adds to both States and StatesDictionary to keep consistency between these data structures
-         *
-         * @param state
-         * @param index
-         * @return True if state was successfully added
-         */
-        bool InsertState(std::string &state, StateType index);
-
-        bool InsertSymbol(std::string &symbol, size_t &index);
-
-        static std::set<StateType> Minimize ( const std::set<StateType> &State, Relation_t &Simulation);
-
-        static std::set<StateType> Post ( std::set<StateType> &State, TransitionFunction &T_Function, std::string &symbol );
-
-        static std::set<StateType> StatePost ( StateType State, TransitionFunction &T_Function , std::string &symbol );
-
-        /**
-         * @brief Get next token in @p line ,tokens are separated by characters in @p whitespace
+         * @brief Get next token in @p line ,tokens are separated with a space
          *
          * @param line
          * @param whitespace
          * @return Next token in the line or std::string::npos if there are no tokens left in the @p line
          */
         static bool get_token(std::string &line, std::string &token);
+    };
+
+    class BinaryRelation {
+    public:
+        /**
+         * @brief Construct a new Binary Relation object with size @p size and all cells are initialized to @p value
+         *
+         * @param size
+         * @param value
+         */
+        BinaryRelation(state_type_t size, bool value);
+
+        /**
+         * @brief Set value of cell at indices @p p and @p q.
+         * If one of the indeces is bigger than size of the relation, nothing is done.
+         *
+         * @param p row index
+         * @param q column index
+         * @param value
+         */
+        void set(state_type_t p, state_type_t q, bool value);
+
+        /**
+         * @brief Set all cells in relation to @p value
+         *
+         * @param value
+         */
+        void set_all(bool value);
+
+        /**
+         * @brief Get value of relation between @p p and @p q
+         *  If either @p p or @p q is bigger than the size of relation, behaviour is undefined
+         * @param p
+         * @param q
+         */
+        bool get(state_type_t p, state_type_t q) const;
+
+        /**
+         * @brief Return size of relation
+         *
+         * @return size of the relation
+         */
+        state_type_t size() const;
+
+        /**
+         * @brief Complement the relation
+         *
+         */
+        void complement();
+
+    protected:
+        std::vector<std::vector<bool>> m_relation;
+        state_type_t m_size;
+    };
+
+    class FiniteAutomata {
+    public:
+        /**
+         * @brief Load an NFA from vata2 format from @p stream
+         *
+         * @param stream
+         */
+        void Load(std::ifstream  &stream);
+
+        /**
+         * @brief Print an NFA in a vata2 format to @p stream
+         *
+         * @param stream
+         */
+        void Print(std::ostream &stream);
+
+        /**
+         * @brief Delete all unreachable and non-terminating states
+         *
+         * @return number of deleted states
+         */
+        state_type_t Minimize();
+
+        /**
+         * @brief Compute simulation relation on states of this finite automaton
+         *
+         * @return BinaryRelation - simulation
+         */
+        BinaryRelation * SimulationRelation() const;
+
+        /**
+         * @brief Compute identity relation on states of this finite automaton
+         *
+         * @return BinaryRelation - identity
+         */
+        BinaryRelation * IdentityRelation() const;
+
+        BinaryRelation * SimulationRelation_simlib(std::chrono::microseconds &conversion_time) const;
+
+        /**
+         * @brief Checks universality of this finite automaton
+         *
+         * @param relation binary relation, which implies language inclusion
+         * @return true if universal
+         */
+        bool isUniversal(const BinaryRelation& relation) const;
+
+        bool isIncluded(FiniteAutomata &another_automaton, FiniteAutomata &union_automaton , BinaryRelation relation) const;
+
+        state_type_t StatesSize() const;
+
+        symbol_type_t AlphabetSize() const;
+
+        bool InsertState(std::string& state);
+
+        bool DeleteState(std::string& state);
+
+        bool InsertStartState(std::string& state);
+
+        bool RemoveStartState(std::string& state);
+
+        bool InsertFinalState(std::string& state);
+
+        bool RemoveFinalState(std::string& state);
+
+        bool InsertSymbol(std::string& symbol);
+
+        bool InsertTransition(std::string& state1, std::string& symbol, std::string& state2);
+
+        /**
+         * @brief Changes names of states in finite automaton @p another_automaton so union of these two can be made. Changes names of states in @p another_automaton .
+         *
+         * @param another_automaton
+         */
+        void MakeDifferent(FiniteAutomata &another_automaton);
+
+        /**
+         * @brief Create union of this and @p another_automaton. Assumes both have the same alphabet and are different in terms of state names.
+         * Use FA::FiniteAutomata::MakeDifferent before calling this function.
+         *
+         * @param another_automaton
+         * @return union of this and @p another_automaton
+         */
+        FiniteAutomata Union(const FiniteAutomata &another_automaton) const;
+
+    protected:
+        std::string Name;
+        States states;
+        Alphabet alphabet;
+        TransitionFunction trans_function;
+        States states_start;
+        States states_final;
+
+        void print_transition_function(std:: ostream &stream, TransitionFunction &trans_function);
+
+        state_type_t minimize_delete_unreachable();
+
+        state_type_t minimize_delete_nonterm();
+
+        static std::set<product_state_t> inclusion_initialize(std::set<product_state_t> p_state, BinaryRelation relation);
+
+        std::set<product_state_t> post_product_state(product_state_t p_state) const;
+
+        std::set<macro_state_t> post_macro_state(std::set<state_type_t> macro_state) const;
+
+        std::set<state_type_t> post_state(state_type_t state, symbol_type_t symbol) const;
+
+        static void minimize_macro_state(std::set<state_type_t> &macro_state, BinaryRelation relation);
+
+        bool is_macro_state_accepting(std::set<state_type_t> &macro_state) const;
+
+        static bool is_product_state_accepting(product_state_t p_state, const States &final_a, const States &final_b);
+
+        static bool is_macro_state_smaller(std::set<state_type_t> macro_state1, std::set<state_type_t> macro_state2, BinaryRelation relation);
+
+        /**
+         * @brief If one of the states is not in the relation, behaviour is undefined
+         *
+         * @param state1
+         * @param state2
+         * @param relation binary relation which implies language inclusion
+         * @return true if language of state @p state1 is included in language of state @p state2
+         */
+        static bool is_state_smaller(state_type_t state1, state_type_t state2, BinaryRelation relation);
+
+        /**
+         * @brief If state @p name_orig doesn't exist or if state @p name_new exists, does nothing
+         *
+         * @param name_orig
+         * @param name_new
+         */
+        void rename_state(std::string name_orig, std::string name_new);
+
     };//FiniteAutomata
 
-} // FA
+}

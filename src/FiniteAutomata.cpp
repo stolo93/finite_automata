@@ -385,10 +385,14 @@ namespace FA
 
     bool FA::FiniteAutomata::isUniversal(const BinaryRelation& relation) const
     {
+        size_t visited_states = 0;
         auto start_states = states_start.get_states();
         if ( ! is_macro_state_accepting(start_states) ){
+            std::cout << "states-visited:" << visited_states << std::endl;
             return false;
         }
+
+        visited_states++;
 
         set<macro_state_t> processed {};
         set<macro_state_t> next {};
@@ -397,9 +401,6 @@ namespace FA
         minimize_macro_state(start_states, relation);
         next.emplace(start_states);
 
-        // Count visited states, initial state was already visited
-        size_t visited_states = 1;
-
         while ( ! next.empty() ){
             // Pick and remove macro state R from next and move it to processed
             auto ms_R = *next.begin();
@@ -407,13 +408,14 @@ namespace FA
             next.erase(ms_R);
 
             auto post_ms_R = post_macro_state(ms_R);
+            visited_states += post_ms_R.size();
 
             for ( auto ms_P : post_ms_R ){
-                visited_states++;
 
                 minimize_macro_state(ms_P, relation);
 
                 if ( ! is_macro_state_accepting(ms_P) ){
+                    std::cout << "states-visited:" << visited_states << std::endl;
                     return false;
                 }
 
@@ -725,10 +727,8 @@ namespace FA
 
     bool FA::FiniteAutomata::is_macro_state_accepting(set<state_type_t> &macro_state) const
     {
-        auto final_states = states_final.get_states();
-
         for ( const auto state : macro_state ){
-            if ( final_states.count(state) != 0 ){
+            if ( states_final.belongs_to(state) ){
                 return true;
             }
         }
@@ -998,17 +998,14 @@ namespace FA
 
     bool FA::States::insert_state_at_index(string& state, state_type_t index)
     {
-        if ( index < m_next_state_index ){
-            return false;
-        }
-
         bool inserted = states_hash.emplace(state, index).second;
 
         if ( inserted ){
             states_dictionary.emplace(index, state);
             m_states.emplace(index);
             m_size++;
-            m_next_state_index = index +1;
+            // Choose max from @p index and m_next_state_index end increment
+            m_next_state_index = (((index) > (m_next_state_index)) ? index : m_next_state_index) + 1;
         }
 
         return inserted;

@@ -244,6 +244,15 @@ namespace FA
         return delete_count;
     }
 
+    void FA::FiniteAutomata::MakeAllFinal()
+    {
+        for ( const auto state : states.get_states() ){
+            auto name = states.get_state_name(state);
+
+            InsertFinalState(name);
+        }
+    }
+
     BinaryRelation * FA::FiniteAutomata::IdentityRelation() const
     {
         auto relation = new BinaryRelation(states.get_max_hash()+1, false);

@@ -1,0 +1,47 @@
+#!/usr/bin/python3
+
+import os
+
+def mkdir_p(path):
+    try:
+        os.mkdir(path)
+    except FileExistsError:
+        return
+    return
+
+def list_to_string(list):
+    final_string = ""
+
+    for el in list:
+        final_string = final_string + " " + el
+
+    return final_string
+
+parent_dir = "nfa_all_final/"
+orig_dir = "nfa/"
+
+mkdir_p(parent_dir)
+
+# list of all directories in the nfa
+subdirs = next(os.walk(orig_dir))[1]
+if len(subdirs) == 0:
+    subdirs.append(".")
+
+for dir in subdirs:
+    dir = dir + '/'
+
+    # Create directory
+    path = os.path.join(parent_dir, dir)
+    mkdir_p(path)
+
+    # Get all files in orig_dir/dir
+    files = os.listdir(orig_dir+dir)
+    for i in range(len(files)):
+        files[i] = orig_dir + dir + files[i]
+
+    file_names = list_to_string(files)
+
+    # # Copy all finite automata from orig_dir and make all states final
+    print("../automata all_final " + path + " " + file_names)
+
+    os.system("../automata all_final " + path + " " + file_names)

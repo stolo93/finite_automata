@@ -398,6 +398,12 @@ namespace FA {
         bool InsertTransition(std::string& state1, std::string& symbol, std::string& state2);
 
         /**
+         * @brief Make all states in automaton final
+         *
+         */
+        void MakeAllFinal();
+
+        /**
          * @brief Changes names of states in finite automaton @p another_automaton so union of these two can be made. Changes names of states in @p another_automaton .
          *
          * @param another_automaton

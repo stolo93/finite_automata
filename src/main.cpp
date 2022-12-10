@@ -18,6 +18,7 @@ int main(int argc, char ** argv)
         args::Command print ( commands, "print", "Concatenate all given files containing finite automata" );
         args::Command universal ( commands, "universal", "Check universality of all given finite automata" );
         args::Command inclusion ( commands, "inclusion", "Check whether the language defined by FA1 is a subset of language defined by FA2. FA1 and FA2 are finite automata given as CL arguments" );
+        args::Command all_final ( commands, "all_final", "Make a copy of given automata where all states are final" );
 
     args::Group inclusion_flags ( parser, "Maintain exclusivity while using these flags. It only makes sense to use these with commands: \"universal and inclusion\"", args::Group::Validators::AtMostOne );
         args::Flag simulation ( inclusion_flags, "Simulation", "Use simulation relation", {'s',"simulation"} );
@@ -44,6 +45,30 @@ int main(int argc, char ** argv)
                 file.close();
             }
 
+        }
+
+        else if ( all_final )
+        {
+            std::string folder_name (*pathsList.begin());
+            for ( auto &&path : pathsList )
+            {
+                if ( path == folder_name ){
+                    continue;
+                }
+                std::ifstream file (path);
+                std::string file_name = path.substr(path.find_last_of('/'));
+                std::ofstream dst_file (folder_name+file_name);
+
+                auto nfa = FA::FiniteAutomata();
+                nfa.Load(file);
+
+                // Change the automaton
+                nfa.MakeAllFinal();
+
+                nfa.Print(dst_file);
+                dst_file << std::endl;
+                file.close();
+            }
         }
 
         else if ( universal )

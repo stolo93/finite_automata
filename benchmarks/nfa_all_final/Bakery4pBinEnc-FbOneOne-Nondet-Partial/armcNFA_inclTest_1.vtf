@@ -1,0 +1,10 @@
+%States q0 q2 q1
+%Alphabet a0 a17
+%Initial q0
+%Final q0 q2 q1
+
+q1 a17 q1
+q1 a0 q1
+q2 a17 q1
+q0 a17 q2
+

@@ -1,0 +1,22 @@
+%States q1 q0
+%Alphabet a3 a39 a24 a23 a0 a6 a2 a18 a36 a22 a21 a1 a10 a33 a40 a38
+%Initial q1
+%Final q1 q0
+
+q0 a0 q0
+q0 a21 q0
+q0 a36 q0
+q0 a18 q0
+q0 a22 q0
+q0 a40 q0
+q0 a2 q0
+q0 a33 q0
+q0 a23 q0
+q0 a38 q0
+q0 a1 q0
+q0 a10 q0
+q0 a24 q0
+q0 a39 q0
+q0 a3 q0
+q1 a6 q0
+

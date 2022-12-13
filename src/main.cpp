@@ -81,6 +81,15 @@ int main(int argc, char ** argv)
 
                 auto start_time_uni = std::chrono::high_resolution_clock::now();
 
+                // Delelete unreachable and non-terminating states
+                auto start_time_minimize = std::chrono::high_resolution_clock::now();
+                std::cout << "states-removed:" << nfa.Minimize() << std::endl;
+                auto stop_time_minimize = std::chrono::high_resolution_clock::now();
+                auto duration_minimize = std::chrono::duration_cast<std::chrono::microseconds> (stop_time_minimize - start_time_minimize);
+
+                std::cout << "minimize-time:" << duration_minimize.count() << std::endl;
+
+
                 FA::BinaryRelation * relation;
                 if ( simulation )
                 {

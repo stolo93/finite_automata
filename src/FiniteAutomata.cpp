@@ -16,6 +16,7 @@
 #include <cstdlib> //exit
 #include <vector>
 #include <chrono>
+#include <limits>
 
 using namespace std;
 
@@ -251,6 +252,67 @@ namespace FA
 
             InsertFinalState(name);
         }
+    }
+
+    void FA::FiniteAutomata::print_distances_to_final(ostream &stream) const
+    {
+        auto distances = dist_to_final();
+
+        for ( const auto state : states.get_states() ){
+            stream << states.get_state_name(state) << ":" << distances[state] << std::endl;
+        }
+    }
+
+    unordered_map<state_type_t, size_t> FA::FiniteAutomata::dist_to_final() const
+    {
+        auto distances = dist_init_inf();
+        auto rev_tfunct = trans_function.revert();
+        for( const auto f_state : states_final.get_states() ){
+            distances[f_state] = 0;
+            size_t current_distance = 1;
+            set<state_type_t> current_reached = rev_tfunct->get_states_from_state(f_state);
+
+            while( ! current_reached.empty() ){
+                set_distances(current_reached, distances, current_distance++);
+                current_reached = all_reachable_states(current_reached, *rev_tfunct);
+            }
+
+        }
+
+        return distances;
+    }
+
+    unordered_map<state_type_t, size_t> FA::FiniteAutomata::dist_init_inf() const
+    {
+        unordered_map<state_type_t, size_t> dist;
+        for( const auto state : states.get_states() ){
+            dist.insert(make_pair(state,SIZE_MAX));
+        }
+        return dist;
+    }
+
+    void FA::FiniteAutomata::set_distances(set<state_type_t> &states, unordered_map<state_type_t, size_t> &distances, size_t dist) const
+    {
+        set<state_type_t> states_copy(states);
+        for( const auto state : states_copy ){
+            if ( distances[state] > dist ){
+                distances[state] = dist;
+            }
+            else{
+                states.erase(state);
+            }
+        }
+    }
+
+    set<state_type_t> FA::FiniteAutomata::all_reachable_states(set<state_type_t> &states, TransitionFunction &trans_funct)
+    {
+        set<state_type_t> reachable {};
+        for ( const auto state : states ){
+            auto current_reachable = trans_funct.get_states_from_state(state);
+            reachable.insert(current_reachable.begin(), current_reachable.end());
+        }
+
+        return reachable;
     }
 
     BinaryRelation * FA::FiniteAutomata::IdentityRelation() const
@@ -1161,6 +1223,16 @@ namespace FA
         else{
             return transition_function[p][a];
         }
+    }
+
+    set<state_type_t> FA::TransitionFunction::get_states_from_state(state_type_t state) const
+    {
+        set<state_type_t> post_state {};
+        for( const auto &on_symbol : this->transition_function[state]){
+            post_state.insert(on_symbol.begin(), on_symbol.end());
+        }
+
+        return post_state;
     }
 
     bool FA::TransitionFunction::insert_transition(state_type_t p, symbol_type_t a, state_type_t q)

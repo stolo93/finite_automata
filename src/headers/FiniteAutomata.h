@@ -205,6 +205,8 @@ namespace FA {
          */
         std::set<state_type_t> get_states(state_type_t p, symbol_type_t a) const;
 
+        std::set<state_type_t> get_states_from_state(state_type_t state) const;
+
         /**
          * Insert transition from @p p to @p q on @p a
          *
@@ -419,6 +421,10 @@ namespace FA {
          */
         FiniteAutomata Union(const FiniteAutomata &another_automaton) const;
 
+        std::unordered_map<state_type_t, size_t> dist_to_final() const;
+
+        void print_distances_to_final(std::ostream &stream) const;
+
     protected:
         std::string Name;
         States states;
@@ -466,6 +472,11 @@ namespace FA {
          * @param name_new
          */
         void rename_state(std::string name_orig, std::string name_new);
+
+    private:
+        std::unordered_map<state_type_t, size_t> dist_init_inf() const;
+        void set_distances(std::set<state_type_t> &states, std::unordered_map<state_type_t, size_t> &distances, size_t dist) const;
+        static std::set<state_type_t> all_reachable_states(std::set<state_type_t> &states, TransitionFunction &trans_funct);
 
     };//FiniteAutomata
 

@@ -1353,6 +1353,19 @@ namespace FA
             m_relation[i/m_size][i%m_size] = ! m_relation[i/m_size][i%m_size];
         }
     }
+
+    state_type_t BinaryRelation::rel_size() const
+    {
+        state_type_t rel_size = 0;
+        for (state_type_t i = 0; i < this->m_size; i++){
+            for(state_type_t j = 0; j < this->m_size; j++){
+                if (this->m_relation[i][j]){
+                    rel_size++;
+                }
+            }
+        }
+        return rel_size;
+    }
 }
 
 //Utils

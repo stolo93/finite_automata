@@ -104,6 +104,8 @@ int main(int argc, char ** argv)
                     relation = nfa.IdentityRelation();
                 }
 
+                std::cout << "rel-size-wo_ident:" << relation->rel_size() - nfa.StatesSize() << std::endl;
+
                 nfa.isUniversal(*relation);
 
                 //Calculate and print time consumed by computing universality [microseconds]
@@ -162,6 +164,8 @@ int main(int argc, char ** argv)
             {
                 relation = union_automaton.IdentityRelation();
             }
+
+            std::cout << "rel-size-wo_ident:" << relation->rel_size() - union_automaton.StatesSize() << std::endl;
 
             // Check language inclusion
             nfa1.isIncluded(nfa2, union_automaton, *relation);

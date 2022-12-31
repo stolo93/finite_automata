@@ -313,7 +313,7 @@ namespace FA {
         bool get(state_type_t p, state_type_t q) const;
 
         /**
-         * @brief Return size of relation
+         * @brief Return size of relation (shape)
          *
          * @return size of the relation
          */
@@ -324,6 +324,8 @@ namespace FA {
          *
          */
         void complement();
+
+        state_type_t rel_size() const;
 
     protected:
         std::vector<std::vector<bool>> m_relation;

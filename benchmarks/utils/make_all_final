@@ -17,8 +17,8 @@ def list_to_string(list):
 
     return final_string
 
-parent_dir = "nfa_all_final/"
-orig_dir = "nfa/"
+parent_dir = "random_difficult_cases_all_final/"
+orig_dir = "random_difficult_cases/"
 
 mkdir_p(parent_dir)
 

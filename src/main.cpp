@@ -79,6 +79,8 @@ int main(int argc, char ** argv)
                 auto nfa = FA::FiniteAutomata();
                 nfa.Load(file);
 
+                std::cout << "state-count:" << nfa.StatesSize() << std::endl;
+
                 auto start_time_uni = std::chrono::high_resolution_clock::now();
 
                 FA::BinaryRelation * relation;

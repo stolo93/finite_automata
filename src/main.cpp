@@ -141,6 +141,7 @@ int main(int argc, char ** argv)
             //Compute union and its relation
             nfa1.MakeDifferent(nfa2);
             auto union_automaton = nfa1.Union(nfa2);
+            std::cout << "state-count-union:" << union_automaton.StatesSize() << std::endl;
             FA::BinaryRelation * relation;
 
             auto start_time_incl = std::chrono::high_resolution_clock::now();
